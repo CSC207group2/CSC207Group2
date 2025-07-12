@@ -1,12 +1,26 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Main {
 
+
     public static void main(String[] args){
+
+
         JFrame frame = new JFrame("Travel Planner Login");
         frame.setSize(300,200);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        JButton loginButton = new JButton("Login");
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(frame, "login method");
+            }
+        });
 
         JPanel usernameTextEntry = new JPanel();
         usernameTextEntry.add(new JLabel("Username"));
@@ -17,7 +31,7 @@ public class Main {
         passwordTextEntry.add(new JTextField(20));
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(new JButton("Login"));
+        buttonPanel.add(loginButton);
         buttonPanel.add(new JButton("Sign Up"));
 
         JPanel panel = new JPanel();
