@@ -71,4 +71,8 @@ public class Main {
             JOptionPane.showMessageDialog(frame, "Please contact support to reset your password.");
         });
     }
+
+    public static void showLoginScreen() {
+        main(null);  // calling main method again to show the login frame
+    }
 }
