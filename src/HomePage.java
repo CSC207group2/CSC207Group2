@@ -4,64 +4,94 @@ import java.awt.*;
 public class HomePage extends JFrame {
     public HomePage(String username) {
         super("Home - Travel Planner");
-        setSize(800, 500);
+
+        // set window size, center on screen, close on exit
+        setSize(1000, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // The main panel with a BoxLayout
+        // overall layout = BorderLayout for top bar and center content
+        setLayout(new BorderLayout());
+
+        // ---------------- Top Bar ----------------
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setBackground(new Color(0, 102, 204)); // deep blue
+        topBar.setPreferredSize(new Dimension(800, 50));
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        JLabel logoLabel = new JLabel("✈ Travel Planner");
+        logoLabel.setForeground(Color.WHITE);
+        logoLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setFocusPainted(false);
+        logoutButton.setBackground(Color.WHITE);
+        logoutButton.setForeground(new Color(0, 102, 204));
+        logoutButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        topBar.add(logoLabel, BorderLayout.WEST);
+        topBar.add(logoutButton, BorderLayout.EAST);
+        add(topBar, BorderLayout.NORTH);
+
+        // ---------------- Main Panel ----------------
         JPanel mainPanel = new JPanel() {
-            // paint the background sky blue
+            // override to paint gradient background
             @Override
-            public void paintComponent(Graphics g) {
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                setBackground(new Color(135, 206, 250));    // light sky blue
+                Graphics2D g2d = (Graphics2D) g;
+                GradientPaint gp = new GradientPaint(0, 0, new Color(135, 206, 250),
+                        0, getHeight(), new Color(173, 216, 230));
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        // The Welcome Label
+        // Welcome text
         JLabel welcome = new JLabel("Welcome, " + username + "!", SwingConstants.CENTER);
         welcome.setAlignmentX(Component.CENTER_ALIGNMENT);
-        welcome.setFont(new Font("SansSerif", Font.BOLD, 20));
-        welcome.setForeground(Color.WHITE);
+        welcome.setFont(new Font("SansSerif", Font.BOLD, 24));
+        welcome.setForeground(Color.DARK_GRAY);
 
-        // Buttons Panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 3, 10, 0));
-        buttonPanel.setOpaque(false);   // setting transparent panel to show background
+        // spacer
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(welcome);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // Trip action buttons
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 20, 0));
+        buttonPanel.setOpaque(false); // allow background to show through
+
         JButton planTripButton = styledButton("Plan a Trip");
-        JButton viewTripButton = styledButton("View Trips");
-        JButton logoutButton = styledButton("Logout");
+        JButton viewTripsButton = styledButton("View Trips");
+        JButton exploreButton = styledButton("Explore Destinations");
 
         buttonPanel.add(planTripButton);
-        buttonPanel.add(viewTripButton);
-        buttonPanel.add(logoutButton);
+        buttonPanel.add(viewTripsButton);
+        buttonPanel.add(exploreButton);
 
-        // adding components to the main panel
-        mainPanel.add(welcome);
-        // adding spacer between components in main panel
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));   // 0 pixels wide, 30 pixels tall
         mainPanel.add(buttonPanel);
 
-        add(mainPanel);
+        add(mainPanel, BorderLayout.CENTER);
 
+        // ---------------- Logout functionality ----------------
         logoutButton.addActionListener(e -> {
-            dispose();  // close the HomePage window
-            Main.showLoginScreen();  // re-open the login screen
+            dispose(); // close this window
+            Main.showLoginScreen(); // return to login screen
         });
-
     }
 
-    // creating a stylish button template
+    // creates a clean blue-outline button
     private JButton styledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("SansSerif", Font.BOLD, 16));
         button.setBackground(Color.WHITE);
-        button.setForeground(new Color(0, 102, 204)); // nice blue color
+        button.setForeground(new Color(0, 102, 204));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(new Color(0, 102, 204), 2));
+        button.setPreferredSize(new Dimension(150, 40));
         return button;
     }
-
 }
