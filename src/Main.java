@@ -1,17 +1,18 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
+import CountryInfo_p.data_access.RESTCountriesAPI;
+import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
+import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
+import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
+import CountryInfo_p.view.CountryInfoView;
 
+import javax.swing.*;
+import java.util.HashMap;
 
 public class Main {
     private static final HashMap<String, String> users = new HashMap<>();
 
-
-    public static void main(String[] args){
-        JFrame frame = new JFrame("Travel Planener Login");
-        frame.setSize(500,200);
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Travel Planner Login");
+        frame.setSize(500, 200);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -20,7 +21,6 @@ public class Main {
         JButton forgotPasswordButton = new JButton("Forgot Password");
         JTextField usernameField = new JTextField(15);
         JPasswordField passwordField = new JPasswordField(15);
-
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -33,7 +33,6 @@ public class Main {
         buttons.add(forgotPasswordButton);
         panel.add(buttons);
 
-
         frame.getContentPane().add(panel);
         frame.setVisible(true);
 
@@ -45,7 +44,17 @@ public class Main {
             if (FirebaseLogin.login(user, pass)) {
                 JOptionPane.showMessageDialog(frame, "Login successful!");
                 frame.dispose();
-                new HomePage(user).setVisible(true);
+
+                //
+                CountryInfoView countryInfoView = new CountryInfoView();
+                CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
+                RESTCountriesAPI dataAccess = new RESTCountriesAPI();
+                CountryInfoInteractor interactor = new CountryInfoInteractor(dataAccess, presenter);
+                CountryInfoController controller = new CountryInfoController(interactor);
+                countryInfoView.setController(controller);
+
+                countryInfoView.setVisible(true);
+
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password.");
             }
@@ -70,7 +79,6 @@ public class Main {
             JOptionPane.showMessageDialog(frame, "Please contact support to reset your password.");
         });
     }
-
     public static void showLoginScreen() {
         main(null);
     }
