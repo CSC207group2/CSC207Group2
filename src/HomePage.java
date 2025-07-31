@@ -76,6 +76,12 @@ public class HomePage extends JFrame {
 
         add(mainPanel, BorderLayout.CENTER);
 
+        // ---------------- Plan a Trip functionality ----------------
+        planTripButton.addActionListener(e-> {
+            dispose();
+            FlightSearchPage.showPanel();
+        });
+
         // ---------------- Logout functionality ----------------
         logoutButton.addActionListener(e -> {
             dispose(); // close this window
