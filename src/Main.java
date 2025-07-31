@@ -36,15 +36,12 @@ public class Main {
         frame.getContentPane().add(panel);
         frame.setVisible(true);
 
-        // Default user
-        users.put("admin", "admin");
-
         // Login logic
         loginButton.addActionListener(e -> {
             String user = usernameField.getText();
             String pass = new String(passwordField.getPassword());
 
-            if (users.containsKey(user) && users.get(user).equals(pass)) {
+            if (FirebaseLogin.login(user, pass)) {
                 JOptionPane.showMessageDialog(frame, "Login successful!");
                 frame.dispose();
 
@@ -68,10 +65,11 @@ public class Main {
             String user = usernameField.getText();
             String pass = new String(passwordField.getPassword());
 
-            if (users.containsKey(user)) {
+            HashMap<String, String> currentUsers = FirebaseLogin.loadUsers();
+            if (currentUsers.containsKey(user)) {
                 JOptionPane.showMessageDialog(frame, "User already exists.");
             } else {
-                users.put(user, pass);
+                FirebaseLogin.addUser(user, pass);
                 JOptionPane.showMessageDialog(frame, "Sign-up successful! You can now log in.");
             }
         });
@@ -82,6 +80,6 @@ public class Main {
         });
     }
     public static void showLoginScreen() {
-        main(null);  // calling main method again to show the login frame
+        main(null);
     }
 }
