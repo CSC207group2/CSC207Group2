@@ -44,16 +44,7 @@ public class Main {
             if (FirebaseLogin.login(user, pass)) {
                 JOptionPane.showMessageDialog(frame, "Login successful!");
                 frame.dispose();
-
-                //
-                CountryInfoView countryInfoView = new CountryInfoView();
-                CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
-                RESTCountriesAPI dataAccess = new RESTCountriesAPI();
-                CountryInfoInteractor interactor = new CountryInfoInteractor(dataAccess, presenter);
-                CountryInfoController controller = new CountryInfoController(interactor);
-                countryInfoView.setController(controller);
-
-                countryInfoView.setVisible(true);
+                new HomePage(user).setVisible(true);
 
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password.");
