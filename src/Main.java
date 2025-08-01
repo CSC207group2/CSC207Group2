@@ -9,6 +9,11 @@ import java.util.HashMap;
 
 public class Main {
     private static final HashMap<String, String> users = new HashMap<>();
+    private static String username;
+
+    public static String getUsername() {
+        return username;
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Travel Planner Login");
@@ -41,11 +46,12 @@ public class Main {
             String user = usernameField.getText();
             String pass = new String(passwordField.getPassword());
 
+            username = user;
+
             if (FirebaseLogin.login(user, pass)) {
                 JOptionPane.showMessageDialog(frame, "Login successful!");
                 frame.dispose();
                 new HomePage(user).setVisible(true);
-
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password.");
             }
