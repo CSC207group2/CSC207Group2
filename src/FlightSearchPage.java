@@ -12,6 +12,8 @@ public class FlightSearchPage extends JFrame {
     JTextArea resultsArea = new JTextArea(20,50);
     JButton selectButton = new JButton("Select Flight");
     JComboBox<String> flightSelector = new JComboBox<>();
+    JButton backButton = new JButton("Go Back to Home Page");
+    Main main = new Main();
 
     public FlightSearchPage() {
         super("Flight Search");
@@ -36,6 +38,12 @@ public class FlightSearchPage extends JFrame {
         flightPanel.add(scrollPane);
         flightPanel.add(selectButton);
         flightPanel.add(flightSelector);
+        flightPanel.add(backButton);
+
+        backButton.addActionListener(e -> {
+            dispose();
+            new HomePage(main.getUsername()).setVisible(true);
+        });
 
         searchButton.addActionListener(e -> {
             String dest = departureField.getText();
