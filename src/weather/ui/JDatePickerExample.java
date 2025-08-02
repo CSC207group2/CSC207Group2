@@ -2,6 +2,8 @@ package weather.ui;
 
 import weather.infrastructure.DateCalculator;
 import weather.infrastructure.GetWeatherRange;
+import weather.domain.WeatherDay;
+import weather.infrastructure.WeatherJSONParser;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -87,51 +89,35 @@ public class JDatePickerExample {
         confirmationButton.addActionListener(e -> {
             try {
                 String location = locationField.getText();
-
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-                ArrayList<String> dateList =
-                        DateCalculator.getDatesBetween(formatter.format(pastDate), formatter.format(futureDate));
+                ArrayList<String> dateList = DateCalculator.getDatesBetween(
+                        formatter.format(pastDate), formatter.format(futureDate)
+                );
 
-                //System.out.println(GetWeatherRange.returnWeatherList(dateList, location));
-                ArrayList result = GetWeatherRange.returnWeatherList(dateList, location);
-                JSONArray resultJSON = new JSONArray(result);
-                //System.out.println("Weather data for " + CITY + ":");
+                ArrayList<JSONObject> rawJsonList = GetWeatherRange.returnWeatherList(dateList, location);
+                ArrayList<WeatherDay> weatherDays = WeatherJSONParser.parseWeatherDays(rawJsonList);
 
-                int x = 10;
+                // rendering
                 scrollPanel.removeAll();
-                for (Object date : result) {
-                    JSONObject weatherForecast = new JSONObject(date.toString());
-                    //System.out.println(date.toString());
-                    JSONObject forecast = weatherForecast.getJSONObject("forecast");
-                    JSONArray forecastArray = new JSONArray(forecast.getJSONArray("forecastday"));
+                int x = 10;
 
-                    for (Object day : forecastArray) {
-                        JSONObject currentDay = new JSONObject(day.toString());
-                        System.out.println(currentDay.getString("date"));
-                        String dateStr = currentDay.getString("date");
-                        JSONObject dayForecastSimple = currentDay.getJSONObject("day");
-                        double max = dayForecastSimple.getDouble("maxtemp_c");
-                        double min = dayForecastSimple.getDouble("mintemp_c");
-//                        System.out.println(dayForecastSimple.getDouble("maxtemp_c"));
-//                        System.out.println(dayForecastSimple.getDouble("mintemp_c"));
-//                        System.out.println("------------");
-                        JPanel weatherBox = new JPanel();
-                        weatherBox.setLayout(new BoxLayout(weatherBox, BoxLayout.Y_AXIS));
-                        weatherBox.setBounds(x, 10, 120, 60);
-                        weatherBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                for (WeatherDay wd : weatherDays) {
+                    JPanel weatherBox = new JPanel();
+                    weatherBox.setLayout(new BoxLayout(weatherBox, BoxLayout.Y_AXIS));
+                    weatherBox.setBounds(x, 10, 120, 60);
+                    weatherBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-                        weatherBox.add(new JLabel("Date: " + dateStr));
-                        weatherBox.add(new JLabel("High: " + max + "°C"));
-                        weatherBox.add(new JLabel("Low: " + min + "°C"));
+                    weatherBox.add(new JLabel("Date: " + wd.getDate()));
+                    weatherBox.add(new JLabel("High: " + wd.getMaxTemp() + "°C"));
+                    weatherBox.add(new JLabel("Low: " + wd.getMinTemp() + "°C"));
 
-                        scrollPanel.add(weatherBox);
-                        x += 130; // move right for next box
-                    }
+                    scrollPanel.add(weatherBox);
+                    x += 130;
                 }
+
                 scrollPanel.revalidate();
                 scrollPanel.repaint();
-
 
             } catch (Exception ex) {
                 ex.printStackTrace();
