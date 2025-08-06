@@ -1,8 +1,4 @@
-import CountryInfo_p.data_access.RESTCountriesAPI;
-import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
-import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
-import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
-import CountryInfo_p.view.CountryInfoView;
+package core;
 
 import javax.swing.*;
 import java.util.HashMap;
