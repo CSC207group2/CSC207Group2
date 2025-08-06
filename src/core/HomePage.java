@@ -1,5 +1,15 @@
+package core;
+
+import CountryInfo_p.data_access.RESTCountriesAPI;
+import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
+import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
+import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
+import CountryInfo_p.view.CountryInfoView;
+import Flights.FlightSearchPage;
+
 import javax.swing.*;
 import java.awt.*;
+import core.*;
 
 public class HomePage extends JFrame {
     public HomePage(String username) {
@@ -33,7 +43,7 @@ public class HomePage extends JFrame {
         topBar.add(logoutButton, BorderLayout.EAST);
         add(topBar, BorderLayout.NORTH);
 
-        // ---------------- Main Panel ----------------
+        // ---------------- cire.Main Panel ----------------
         JPanel mainPanel = new JPanel() {
             // override to paint gradient background
             @Override
@@ -75,6 +85,17 @@ public class HomePage extends JFrame {
         mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+
+        exploreButton.addActionListener(e -> {
+            CountryInfoView countryInfoView = new CountryInfoView();
+            CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
+            RESTCountriesAPI dataAccess = new RESTCountriesAPI();
+            CountryInfoInteractor interactor = new CountryInfoInteractor(dataAccess, presenter);
+            CountryInfoController controller = new CountryInfoController(interactor);
+            countryInfoView.setController(controller);
+
+            countryInfoView.setVisible(true);
+        });
 
         // ---------------- Plan a Trip functionality ----------------
         planTripButton.addActionListener(e-> {
