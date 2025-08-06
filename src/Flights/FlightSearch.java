@@ -1,3 +1,5 @@
+package Flights;
+
 import com.google.gson.*;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FlightSearch extends FlightSearchPage{
+
     public static void searchFlights(String departure, String arrival, String date, Integer stops, String returnDate,
                                      JTextArea resultsArea, JButton selectButton, JComboBox<String> flightSelector) {
         OkHttpClient client = new OkHttpClient();
@@ -51,47 +54,55 @@ public class FlightSearch extends FlightSearchPage{
                 }
 
                 int flight_counter = 0;
-                Map<String, List<String>> departure_info = new HashMap<>();
-                Map<String, List<String>> arrival_info = new HashMap<>();
+                Map<String, Map<String, String>> departure_info = new HashMap<>();
+                Map<String, Map<String, String>> arrival_info = new HashMap<>();
+                List<String> travel_class = new ArrayList<>();
 
                 for (JsonElement flightElem : flights) {
                     flight_counter++;
 
                     JsonObject flight = flightElem.getAsJsonObject();
 
-                    List<String> departure_data = new ArrayList<>();
-                    if (flight.has("departure_airport")) {
+                    if (flight.has("flights")) {
                         String curr;
-                        JsonObject data = flights.get(0).getAsJsonObject();
-                        if (data.has("name")) {
-                            curr = data.get("name").getAsString();
-                            departure_data.add(curr);
-                        }
-                        if (data.has("time")) {
-                            curr = data.get("time").getAsString();
-                            departure_data.add(curr);
-                        }
-                    }
-                    departure_info.put("Flight #" + (flight_counter) , departure_data);
-                    departure_data.clear();
+                        JsonArray data = flight.getAsJsonArray("flights");
+                        JsonObject flight_info = data.get(0).getAsJsonObject();
 
-                    List<String> arrival_data = new ArrayList<>();
-                    if (flight.has("arrival_airport")) {
-                        String curr;
-                        JsonObject data = flights.get(0).getAsJsonObject();
-                        if (data.has("name")) {
-                            curr = data.get("name").getAsString();
-                            arrival_data.add(curr);
+                        Map<String, String> departure_data = new HashMap<>();
+                        Map<String, String> arrival_data = new HashMap<>();
+
+                        if (flight_info.has("departure_airport")){
+                            JsonObject dep = flight_info.get("departure_airport").getAsJsonObject();
+                            if (dep.has("name")) {
+                                curr = dep.get("name").getAsString();
+                                departure_data.put("name", curr);
+                            }
+                            if (dep.has("time")) {
+                                curr = dep.get("time").getAsString();
+                                departure_data.put("time", curr);
+                            }
                         }
-                        if (data.has("time")) {
-                            curr = data.get("time").getAsString();
-                            arrival_data.add(curr);
+                        if (flight_info.has("arrival_airport")){
+                            JsonObject ari = flight_info.get("arrival_airport").getAsJsonObject();
+                            if (ari.has("name")) {
+                                curr = ari.get("name").getAsString();
+                                arrival_data.put("name", curr);
+                            }
+                            if (ari.has("time")) {
+                                curr = ari.get("time").getAsString();
+                                arrival_data.put("time", curr);
+                            }
                         }
+                        if (flight_info.has("flight_number")){
+                            curr = flight_info.get("flight_number").getAsString();
+                            arrival_data.put("flight_id", curr);
+                        }
+                        departure_info.put("Flight #" + (flight_counter) , departure_data);
+                        arrival_info.put("Flight #" + (flight_counter) , arrival_data);
                     }
-                    arrival_info.put("Flight #" + (flight_counter) , arrival_data);
-                    arrival_data.clear();
 
                     String price = String.valueOf(flight.get("price"));
+                    travel_class.add(String.valueOf(flight.get("travel_class")));
 
                     String airline = "Unknown";
                     int duration;
@@ -111,7 +122,6 @@ public class FlightSearch extends FlightSearchPage{
                             }
                             if (firstFlight.has("flight_number")){
                                 flight_num = firstFlight.get("flight_number").getAsString();
-
                         }
                     }
 
@@ -122,8 +132,8 @@ public class FlightSearch extends FlightSearchPage{
                         finalDuration = (durationHours) + "hrs " + (durationMinute) + "min";
                     }
 
-                    sb.append("✈ Airline: ").append(airline).append("\n")
-                            .append("🕒 Total Trip Duration: ").append(finalDuration).append("\n")
+                    sb.append("Flight #").append(flight_counter).append("\n").append("✈ Airline: ").append(airline)
+                            .append("\n").append("🕒 Total Trip Duration: ").append(finalDuration).append("\n")
                             .append("💰 Price: $").append(price).append("\n").append("Flight Number: ")
                             .append(flight_num).append("\n");
 
@@ -157,59 +167,10 @@ public class FlightSearch extends FlightSearchPage{
                 }
                 resultsArea.setText(sb.toString());
 
-
-
-                JButton continueButton = new JButton("Continue");
-                JButton backButton = new JButton("Go Back");
-                JsonArray finalFlights = flights;
-                List<JsonObject> selectedFlights = new ArrayList<>();
                 selectButton.addActionListener(e -> {
-                    int selectedIndex = flightSelector.getSelectedIndex();
-                    if (selectedIndex >= 0) {
-                        JsonObject selectedFlight = finalFlights.get(selectedIndex).getAsJsonObject();
-                        System.out.println(selectedFlight);
-                        String airline = "Unknown" ;
-                        String flight_num = "Unknown";
-                        if (selectedFlight.has("flights")){
-                            JsonArray flightArray = selectedFlight.getAsJsonArray("flights");
-                            JsonObject flightDetails = flightArray.get(0).getAsJsonObject();
-                            airline = flightDetails.get("airline").getAsString();
-                            flight_num = flightDetails.get("flight_number").getAsString();
-                        }
-                        selectedFlights.add(selectedFlight);
-                        // Do something with selectedFlight:
-                        JPanel selected = new JPanel();
-                        selected.setLayout(new BoxLayout(selected, BoxLayout.Y_AXIS));
-                        JLabel line1 = new JLabel("You Selected: ");
-                        JLabel line2 = new JLabel("Price: $" + selectedFlight.get("price").getAsInt());
-                        JLabel line3 = new JLabel("Airline: " + airline);
-                        JLabel line4 = new JLabel("Flight Number: " + flight_num);
-                        selected.add(line1);
-                        selected.add(line2);
-                        selected.add(line3);
-                        selected.add(line4);
-                        JPanel buttons = new JPanel();
-                        buttons.add(backButton);
-                        buttons.add(continueButton);
-                        selected.add(buttons);
-                        selected.setVisible(true);
-                        JFrame showSelection = new JFrame();
-                        showSelection.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                        showSelection.getContentPane().add(selected);
-                        showSelection.setSize(275, 125);
-                        showSelection.setLocationRelativeTo(null);
-                        showSelection.setVisible(true);
-                        backButton.addActionListener(e1 -> {
-                            selectedFlights.clear();
-                            showSelection.dispose();
-                        });
+                    FlightSelectedPanel flightSelectedPanel = new FlightSelectedPanel(flights, flightSelector,
+                            departure_info, arrival_info, travel_class);
 
-                       continueButton.addActionListener(e2 -> {
-                           showSelection.dispose();
-                           FlightSelection.selectedFlight(departure_info, arrival_info,
-                                   flightSelector.getSelectedItem().toString());
-                       });
-                    }
                 });
 
 

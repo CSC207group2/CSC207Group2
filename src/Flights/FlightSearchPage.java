@@ -1,5 +1,7 @@
-import javax.swing.*;
+package Flights;
 
+import javax.swing.*;
+import core.*;
 
 public class FlightSearchPage extends JFrame {
     JTextField departureField = new JTextField(10);
@@ -13,7 +15,6 @@ public class FlightSearchPage extends JFrame {
     JButton selectButton = new JButton("Select Flight");
     JComboBox<String> flightSelector = new JComboBox<>();
     JButton backButton = new JButton("Go Back to Home Page");
-    Main main = new Main();
 
     public FlightSearchPage() {
         super("Flight Search");
@@ -42,7 +43,7 @@ public class FlightSearchPage extends JFrame {
 
         backButton.addActionListener(e -> {
             dispose();
-            new HomePage(main.getUsername()).setVisible(true);
+            new HomePage(Main.getUsername()).setVisible(true);
         });
 
         searchButton.addActionListener(e -> {
