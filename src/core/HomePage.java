@@ -122,6 +122,7 @@ public class HomePage extends JFrame {
 
         // ---------------- Travel Tips % Warnings Button Functionality  ----------------
         travelTipsButton.addActionListener(e -> {
+            dispose();
             TravelTipsPage.showPanel();
         });
 

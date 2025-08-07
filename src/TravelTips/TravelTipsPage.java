@@ -27,9 +27,11 @@ public class TravelTipsPage extends JFrame {
         inputPanel.add(cityField);
         inputPanel.add(searchButton);
 
-        // Center result display
+        // Center result display with word wrap
         JTextArea resultArea = new JTextArea();
         resultArea.setEditable(false);
+        resultArea.setLineWrap(true);           // Enable line wrapping
+        resultArea.setWrapStyleWord(true);      // Wrap at word boundaries
         JScrollPane scrollPane = new JScrollPane(resultArea);
 
         // Bottom panel with styled "Go Back to Home Page" button
