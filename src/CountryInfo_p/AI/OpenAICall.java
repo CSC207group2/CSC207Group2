@@ -14,10 +14,10 @@ public class OpenAICall {
     private  static  final String API_KEY = "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";
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
 
-    public static String getTravelInsights(String airport) {
+    public static String getTravelInsights(String airport_or_city) {
         try
         {
-            String prompt = "Write me a 100 word summary of common scams, places to avoid, and common tourist attractions in the city of the following airport: " + airport + ".";
+            String prompt = "Write me a 100 word summary of common scams, places to avoid, and common tourist attractions in the following airport or city: " + airport_or_city + ".";
             String payload = "{\n" +
                     "  \"model\": \"gpt-4o-mini\",\n" +
                     "  \"messages\": [\n" +
