@@ -1,5 +1,6 @@
 package weather.ui;
 
+import core.HomePage;
 import weather.domain.WeatherService;
 import weather.infrastructure.DateCalculator;
 import weather.infrastructure.GetWeatherRange;
@@ -26,7 +27,7 @@ public class JDatePickerExample {
     private JPanel scrollPanel;
     private JScrollPane scrollPane;
 
-    public void launch() {
+    public void launch(String user) {
 
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -63,7 +64,7 @@ public class JDatePickerExample {
         JDatePickerImpl picker2 = new JDatePickerImpl(panel2, new DateLabelFormatter());
 
         JButton confirmationButton = new JButton("Confirm Date");
-
+        JButton backButton = new JButton("Back to Home");
         scrollPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         scrollPane = new JScrollPane(scrollPanel);
         scrollPane.setPreferredSize(new Dimension(550, 100));
@@ -79,11 +80,32 @@ public class JDatePickerExample {
             futureDate = (Date) picker2.getModel().getValue();
             System.out.println("End Date selected: " + futureDate);
         });
-
+        backButton.addActionListener(e -> {
+            new HomePage(user).setVisible(true);
+            frame.dispose();
+            }
+        );
         confirmationButton.addActionListener(e -> {
             try {
                 String location = locationField.getText();
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+                if (pastDate == null || futureDate == null) {
+                    JOptionPane.showMessageDialog(null, "Please select both start and end dates.");
+                    return;
+                }
+
+                Date today = new Date();
+
+                if (pastDate.after(futureDate)) {
+                    JOptionPane.showMessageDialog(null, "Start date must be before or equal to end date.");
+                    return;
+                }
+
+                if (pastDate.before(today)) {
+                    JOptionPane.showMessageDialog(null, "Start date must be today or a future date.");
+                    return;
+                }
 
                 ArrayList<String> dateList = DateCalculator.getDatesBetween(
                         formatter.format(pastDate), formatter.format(futureDate)
@@ -116,6 +138,7 @@ public class JDatePickerExample {
                 scrollPanel.repaint();
 
             } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
@@ -128,6 +151,7 @@ public class JDatePickerExample {
         frame.add(new JLabel("End Date:"));
         frame.add(picker2);
         frame.add(confirmationButton);
+        frame.add(backButton);
         frame.add(scrollPane);
 
         frame.setVisible(true);

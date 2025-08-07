@@ -16,7 +16,10 @@ public class GetWeatherRange {
         for (String date : dateList) {
             JSONObject weatherJson = new JSONObject(weatherService.getWeatherJson(city, date));
             weatherList.add(weatherJson);
-
+            if (weatherJson.has("error")) {
+                String message = weatherJson.getJSONObject("error").getString("message");
+                throw new Exception("Invalid city: " + message);
+            }
 
         }
         return weatherList;
