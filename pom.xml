@@ -40,10 +40,12 @@
             <artifactId>json</artifactId>
             <version>20240303</version>
         </dependency>
+
+        <!-- Firebase Admin SDK for Realtime Database access -->
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>9.2.0</version> <!-- use latest -->
+            <version>9.2.0</version>
         </dependency>
 
     </dependencies>

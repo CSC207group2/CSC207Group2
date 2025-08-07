@@ -19,9 +19,4 @@ public class DateCalculator {
 
         return dates;
     }
-
-    public static void main(String[] args) {
-        ArrayList<String> range = getDatesBetween("2025-07-25", "2025-10-28");
-        range.forEach(System.out::println);
-    }
 }

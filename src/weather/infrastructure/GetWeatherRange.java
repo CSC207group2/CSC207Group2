@@ -1,19 +1,25 @@
 package weather.infrastructure;
 
 import org.json.JSONObject;
-
+import weather.domain.WeatherService;
 import java.util.ArrayList;
 
 public class GetWeatherRange {
-    private static final ArrayList<String> dateList = new ArrayList<>();
+    private final WeatherService weatherService;
 
-    public static ArrayList<JSONObject> returnWeatherList(ArrayList<String> dateList, String city) throws Exception {
+    public GetWeatherRange(WeatherService weatherService) {
+        this.weatherService = weatherService;
+    }
+
+    public ArrayList<JSONObject> returnWeatherList(ArrayList<String> dateList, String city) throws Exception {
         ArrayList<JSONObject> weatherList = new ArrayList<>();
-
         for (String date : dateList) {
-            JSONObject weatherJson = new JSONObject(WeatherAPIAccess.getWeatherJson(city, date));
+            JSONObject weatherJson = new JSONObject(weatherService.getWeatherJson(city, date));
             weatherList.add(weatherJson);
-
+            if (weatherJson.has("error")) {
+                String message = weatherJson.getJSONObject("error").getString("message");
+                throw new Exception("Invalid city: " + message);
+            }
 
         }
         return weatherList;

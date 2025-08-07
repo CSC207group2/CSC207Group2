@@ -5,7 +5,8 @@ import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
 import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
 import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
-import Flights.FlightSearchPage;
+import Flights.FlightSearch;
+import Flights.FlightSearchPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,37 +18,52 @@ public class HomePage extends JFrame {
     public HomePage(String username) {
         super("Home - Travel Planner");
 
-        // set window size, center on screen, close on exit
         setSize(1000, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        // overall layout = BorderLayout for top bar and center content
         setLayout(new BorderLayout());
 
         // ---------------- Top Bar ----------------
         JPanel topBar = new JPanel(new BorderLayout());
-        topBar.setBackground(new Color(0, 102, 204)); // deep blue
+        topBar.setBackground(new Color(0, 102, 204));
         topBar.setPreferredSize(new Dimension(800, 50));
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JLabel logoLabel = new JLabel("✈ Travel Planner");
         logoLabel.setForeground(Color.WHITE);
         logoLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        topBar.add(logoLabel, BorderLayout.WEST);
+
+        // Right-side controls (Logs + Logout)
+        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightControls.setOpaque(false);
+
+        // “My Recent Logs” opens the window for THIS user
+        JButton logsButton = new JButton("My Recent Logs");
+        logsButton.setFocusPainted(false);
+        logsButton.addActionListener(e -> {
+            FirebaseInitializer.initialize();       // safe to call multiple times
+            new RecentLogsWindow(username);
+        });
 
         JButton logoutButton = new JButton("Logout");
         logoutButton.setFocusPainted(false);
         logoutButton.setBackground(Color.WHITE);
         logoutButton.setForeground(new Color(0, 102, 204));
         logoutButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        logoutButton.addActionListener(e -> {
+            dispose();
+            Main.showLoginScreen();
+        });
 
-        topBar.add(logoLabel, BorderLayout.WEST);
-        topBar.add(logoutButton, BorderLayout.EAST);
+        rightControls.add(logsButton);
+        rightControls.add(logoutButton);
+        topBar.add(rightControls, BorderLayout.EAST);
+
         add(topBar, BorderLayout.NORTH);
 
-        // ---------------- cire.Main Panel ----------------
+        // ---------------- Main Panel ----------------
         JPanel mainPanel = new JPanel() {
-            // override to paint gradient background
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -61,20 +77,17 @@ public class HomePage extends JFrame {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        // Welcome text
         JLabel welcome = new JLabel("Welcome, " + username + "!", SwingConstants.CENTER);
         welcome.setAlignmentX(Component.CENTER_ALIGNMENT);
         welcome.setFont(new Font("SansSerif", Font.BOLD, 24));
         welcome.setForeground(Color.DARK_GRAY);
 
-        // spacer
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(welcome);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        // Trip action buttons
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 20, 0));
-        buttonPanel.setOpaque(false); // allow background to show through
+        buttonPanel.setOpaque(false);
 
         JButton planTripButton = styledButton("Plan a Trip");
         JButton viewTripsButton = styledButton("View Trips");
@@ -85,9 +98,9 @@ public class HomePage extends JFrame {
         buttonPanel.add(exploreButton);
 
         mainPanel.add(buttonPanel);
-
         add(mainPanel, BorderLayout.CENTER);
 
+        // ---------------- Explore Destinations (Country Info) ----------------
         exploreButton.addActionListener(e -> {
             CountryInfoView countryInfoView = new CountryInfoView();
             CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
@@ -95,7 +108,6 @@ public class HomePage extends JFrame {
             CountryInfoInteractor interactor = new CountryInfoInteractor(dataAccess, presenter);
             CountryInfoController controller = new CountryInfoController(interactor);
             countryInfoView.setController(controller);
-
             countryInfoView.setVisible(true);
         });
 
@@ -126,17 +138,12 @@ public class HomePage extends JFrame {
             TravelTipsPage.showPanel();
         });
 
-
-        // ---------------- Plan a Trip functionality ----------------
-        planTripButton.addActionListener(e-> {
+        // ---------------- Plan a Trip (Flights) ----------------
+        planTripButton.addActionListener(e -> {
             dispose();
-            FlightSearchPage.showPanel();
-        });
-
-        // ---------------- Logout functionality ----------------
-        logoutButton.addActionListener(e -> {
-            dispose(); // close this window
-            Main.showLoginScreen(); // return to login screen
+            // Make username available to the flights feature before showing UI
+            FlightSearch.setUsername(username);
+            FlightSearchPanel.showPanel();
         });
     }
 

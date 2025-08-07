@@ -1,7 +1,12 @@
 package weather.ui;
 
+import core.HomePage;
+import weather.domain.WeatherService;
 import weather.infrastructure.DateCalculator;
 import weather.infrastructure.GetWeatherRange;
+import weather.domain.WeatherDay;
+import weather.infrastructure.WeatherAPIAccess;
+import weather.infrastructure.WeatherJSONParser;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -22,16 +27,8 @@ public class JDatePickerExample {
     private JPanel scrollPanel;
     private JScrollPane scrollPane;
 
-    public void launch() {
+    public void launch(String user) {
 
-
-//        try {
-//            UIManager.setLookAndFeel( new FlatLightLaf() );
-//        } catch( Exception ex ) {
-//            System.err.println( "Failed to initialize LaF" );
-//        }
-
-        //nimbus ui from chatgpt thank you
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -67,7 +64,7 @@ public class JDatePickerExample {
         JDatePickerImpl picker2 = new JDatePickerImpl(panel2, new DateLabelFormatter());
 
         JButton confirmationButton = new JButton("Confirm Date");
-
+        JButton backButton = new JButton("Back to Home");
         scrollPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         scrollPane = new JScrollPane(scrollPanel);
         scrollPane.setPreferredSize(new Dimension(550, 100));
@@ -83,57 +80,65 @@ public class JDatePickerExample {
             futureDate = (Date) picker2.getModel().getValue();
             System.out.println("End Date selected: " + futureDate);
         });
-
+        backButton.addActionListener(e -> {
+            new HomePage(user).setVisible(true);
+            frame.dispose();
+            }
+        );
         confirmationButton.addActionListener(e -> {
             try {
                 String location = locationField.getText();
-
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-                ArrayList<String> dateList =
-                        DateCalculator.getDatesBetween(formatter.format(pastDate), formatter.format(futureDate));
-
-                //System.out.println(GetWeatherRange.returnWeatherList(dateList, location));
-                ArrayList result = GetWeatherRange.returnWeatherList(dateList, location);
-                JSONArray resultJSON = new JSONArray(result);
-                //System.out.println("Weather data for " + CITY + ":");
-
-                int x = 10;
-                scrollPanel.removeAll();
-                for (Object date : result) {
-                    JSONObject weatherForecast = new JSONObject(date.toString());
-                    //System.out.println(date.toString());
-                    JSONObject forecast = weatherForecast.getJSONObject("forecast");
-                    JSONArray forecastArray = new JSONArray(forecast.getJSONArray("forecastday"));
-
-                    for (Object day : forecastArray) {
-                        JSONObject currentDay = new JSONObject(day.toString());
-                        System.out.println(currentDay.getString("date"));
-                        String dateStr = currentDay.getString("date");
-                        JSONObject dayForecastSimple = currentDay.getJSONObject("day");
-                        double max = dayForecastSimple.getDouble("maxtemp_c");
-                        double min = dayForecastSimple.getDouble("mintemp_c");
-//                        System.out.println(dayForecastSimple.getDouble("maxtemp_c"));
-//                        System.out.println(dayForecastSimple.getDouble("mintemp_c"));
-//                        System.out.println("------------");
-                        JPanel weatherBox = new JPanel();
-                        weatherBox.setLayout(new BoxLayout(weatherBox, BoxLayout.Y_AXIS));
-                        weatherBox.setBounds(x, 10, 120, 60);
-                        weatherBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-
-                        weatherBox.add(new JLabel("Date: " + dateStr));
-                        weatherBox.add(new JLabel("High: " + max + "°C"));
-                        weatherBox.add(new JLabel("Low: " + min + "°C"));
-
-                        scrollPanel.add(weatherBox);
-                        x += 130; // move right for next box
-                    }
+                if (pastDate == null || futureDate == null) {
+                    JOptionPane.showMessageDialog(null, "Please select both start and end dates.");
+                    return;
                 }
+
+                Date today = new Date();
+
+                if (pastDate.after(futureDate)) {
+                    JOptionPane.showMessageDialog(null, "Start date must be before or equal to end date.");
+                    return;
+                }
+
+                if (pastDate.before(today)) {
+                    JOptionPane.showMessageDialog(null, "Start date must be today or a future date.");
+                    return;
+                }
+
+                ArrayList<String> dateList = DateCalculator.getDatesBetween(
+                        formatter.format(pastDate), formatter.format(futureDate)
+                );
+
+                WeatherService weatherService = new WeatherAPIAccess();
+                GetWeatherRange rangeGetter = new GetWeatherRange(weatherService);
+                ArrayList<JSONObject> rawJsonList = rangeGetter.returnWeatherList(dateList, location);
+                ArrayList<WeatherDay> weatherDays = WeatherJSONParser.parseWeatherDays(rawJsonList);
+
+                // rendering
+                scrollPanel.removeAll();
+                int x = 10;
+
+                for (WeatherDay wd : weatherDays) {
+                    JPanel weatherBox = new JPanel();
+                    weatherBox.setLayout(new BoxLayout(weatherBox, BoxLayout.Y_AXIS));
+                    weatherBox.setBounds(x, 10, 120, 60);
+                    weatherBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+                    weatherBox.add(new JLabel("Date: " + wd.getDate()));
+                    weatherBox.add(new JLabel("High: " + wd.getMaxTemp() + "°C"));
+                    weatherBox.add(new JLabel("Low: " + wd.getMinTemp() + "°C"));
+
+                    scrollPanel.add(weatherBox);
+                    x += 130;
+                }
+
                 scrollPanel.revalidate();
                 scrollPanel.repaint();
 
-
             } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
@@ -146,6 +151,7 @@ public class JDatePickerExample {
         frame.add(new JLabel("End Date:"));
         frame.add(picker2);
         frame.add(confirmationButton);
+        frame.add(backButton);
         frame.add(scrollPane);
 
         frame.setVisible(true);
