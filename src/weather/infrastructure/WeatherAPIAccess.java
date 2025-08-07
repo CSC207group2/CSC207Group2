@@ -15,10 +15,10 @@ public class WeatherAPIAccess {
         String requestUrl;
         if (elapsedDays <= 14) {
             requestUrl = "https://api.weatherapi.com/v1/forecast.json?key=" +
-                    Constants.API_KEY + "&q=" + city + "&days=" + elapsedDays;
+                    System.getenv("WeatherAPI") + "&q=" + city + "&days=" + elapsedDays;
         }else {
             requestUrl = "https://api.weatherapi.com/v1/future.json?key=" +
-                    Constants.API_KEY + "&q=" + city + "&dt=" + date;
+                    System.getenv("WeatherAPI") + "&q=" + city + "&dt=" + date;
         }
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
