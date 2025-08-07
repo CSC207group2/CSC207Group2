@@ -5,8 +5,11 @@ import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
 import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
 import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
+
 import Flights.FlightSearch;
 import Flights.FlightSearchPage;
+import Flights.FlightSearchPanel;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,6 +102,7 @@ public class HomePage extends JFrame {
 
         // ---------------- Explore Destinations (Country Info) ----------------
         exploreButton.addActionListener(e -> {
+            dispose();
             CountryInfoView countryInfoView = new CountryInfoView();
             CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
             RESTCountriesAPI dataAccess = new RESTCountriesAPI();
@@ -108,11 +112,18 @@ public class HomePage extends JFrame {
             countryInfoView.setVisible(true);
         });
 
+
         // ---------------- Plan a Trip (Flights) ----------------
         planTripButton.addActionListener(e -> {
             // Make username available to the flights feature before showing UI
             FlightSearch.setUsername(username);
             FlightSearchPage.showPanel();
+
+        // ---------------- Plan a Trip functionality ----------------
+        planTripButton.addActionListener(e-> {
+            dispose();
+            FlightSearchPanel.showPanel();
+
         });
     }
 
