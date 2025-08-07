@@ -68,7 +68,7 @@ public class FlightSearch extends FlightSearchPanel {
                 resultsArea.setText(sb.toString());
 
                 selectButton.addActionListener(e -> {
-                   new FlightSelectedPanel(flights, flightSelector, departure_info, arrival_info, travel_class);
+                    new FlightSelectedPanel(flights, flightSelector, departure_info, arrival_info, travel_class, username);
                 });
 
             } else {
@@ -133,18 +133,18 @@ public class FlightSearch extends FlightSearchPanel {
             String finalDuration = "Unknown";
             if (flight.has("flights") && flight.get("flights").isJsonArray()){
                 JsonArray flightsArray = flight.getAsJsonArray("flights");
-                    JsonObject firstFlight = flightsArray.get(0).getAsJsonObject();
-                    if (firstFlight.has("airline")) {
-                        airline = firstFlight.get("airline").getAsString();
-                    }
-                    if (firstFlight.has("duration")){
-                        duration = firstFlight.get("duration").getAsInt();
-                        int durationHours = duration / 60;
-                        int durationMinute = duration % 60;
-                        finalDuration = (durationHours) + "Hrs " + (durationMinute) + "M";
-                    }
-                    if (firstFlight.has("flight_number")){
-                        flight_num = firstFlight.get("flight_number").getAsString();
+                JsonObject firstFlight = flightsArray.get(0).getAsJsonObject();
+                if (firstFlight.has("airline")) {
+                    airline = firstFlight.get("airline").getAsString();
+                }
+                if (firstFlight.has("duration")){
+                    duration = firstFlight.get("duration").getAsInt();
+                    int durationHours = duration / 60;
+                    int durationMinute = duration % 60;
+                    finalDuration = (durationHours) + "Hrs " + (durationMinute) + "M";
+                }
+                if (firstFlight.has("flight_number")){
+                    flight_num = firstFlight.get("flight_number").getAsString();
                 }
             }
 
@@ -167,27 +167,21 @@ public class FlightSearch extends FlightSearchPanel {
 
             if (flight.has("layovers")) {
                 JsonArray flightsArray = flight.getAsJsonArray("layovers");
-                    JsonObject firstFlight = flightsArray.get(0).getAsJsonObject();
-                    if (firstFlight.has("name")) {
-                        layover_location = firstFlight.get("name").getAsString();
-                    }
-                    if (firstFlight.has("duration")){
-                        layover_duration = firstFlight.get("duration").getAsInt();
-                        int durationHours = layover_duration / 60;
-                        int durationMinute = layover_duration % 60;
-                        final_duration = (durationHours) + "hrs " + (durationMinute) + "min";
-                    }
-                    sb.append("\n").append("Layover Information: ").append("\n").append("🕒 Layover Duration: ").
-                            append(final_duration).append("\n").append("📍 Layover Location: ").
-                            append(layover_location);
-
-
-                selectButton.addActionListener(e -> {
-                    FlightSelectedPanel flightSelectedPanel = new FlightSelectedPanel(flights, flightSelector,
-                            departure_info, arrival_info, travel_class, username);
+                JsonObject firstFlight = flightsArray.get(0).getAsJsonObject();
+                if (firstFlight.has("name")) {
+                    layover_location = firstFlight.get("name").getAsString();
+                }
+                if (firstFlight.has("duration")){
+                    layover_duration = firstFlight.get("duration").getAsInt();
+                    int durationHours = layover_duration / 60;
+                    int durationMinute = layover_duration % 60;
+                    final_duration = (durationHours) + "hrs " + (durationMinute) + "min";
+                }
+                sb.append("\n").append("Layover Information: ").append("\n").append("🕒 Layover Duration: ").
+                        append(final_duration).append("\n").append("📍 Layover Location: ").
+                        append(layover_location);
 
             }
-
 
 
             sb.append("\n------------------------\n\n");
