@@ -16,7 +16,8 @@ public class WeatherJSONParser {
             JSONObject forecast = weatherForecast.getJSONObject("forecast");
             JSONArray forecastArray = forecast.getJSONArray("forecastday");
 
-            for (Object obj : forecastArray) {
+            //for (Object obj : forecastArray) {
+            Object obj = forecastArray.get(forecastArray.length() - 1);
                 JSONObject dayObj = (JSONObject) obj;
                 String date = dayObj.getString("date");
                 JSONObject day = dayObj.getJSONObject("day");
@@ -24,7 +25,7 @@ public class WeatherJSONParser {
                 double min = day.getDouble("mintemp_c");
 
                 result.add(new WeatherDay(date, max, min));
-            }
+            //}
         }
 
         return result;

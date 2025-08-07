@@ -1,7 +1,7 @@
 package weather.infrastructure;
 
 public class Constants {
-    public static final String API_KEY = "aa67bd411f7e4f7e976231459252207";
+    public static final String API_KEY = "123012d16d944970a9152848250708";
 
     public static void main(String[] args) {
 

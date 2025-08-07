@@ -11,15 +11,15 @@ public class WeatherAPIAccess {
     public static String getWeatherJson(String city, String date) throws Exception {
         LocalDate current = LocalDate.now();
         int elapsedDays = DateCalculator.getDatesBetween(current.toString(), date).size();
-
-        if (elapsedDays < 14) {
-            String requestUrl = "https://api.weatherapi.com/v1/forecast.json?key=" +
+        System.out.println(elapsedDays);
+        String requestUrl;
+        if (elapsedDays <= 14) {
+            requestUrl = "https://api.weatherapi.com/v1/forecast.json?key=" +
                     Constants.API_KEY + "&q=" + city + "&days=" + elapsedDays;
+        }else {
+            requestUrl = "https://api.weatherapi.com/v1/future.json?key=" +
+                    Constants.API_KEY + "&q=" + city + "&dt=" + date;
         }
-
-        String requestUrl = "https://api.weatherapi.com/v1/future.json?key=" +
-                Constants.API_KEY + "&q=" + city + "&dt=" + date;
-
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

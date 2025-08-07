@@ -26,14 +26,6 @@ public class JDatePickerExample {
 
     public void launch() {
 
-
-//        try {
-//            UIManager.setLookAndFeel( new FlatLightLaf() );
-//        } catch( Exception ex ) {
-//            System.err.println( "Failed to initialize LaF" );
-//        }
-
-        //nimbus ui from chatgpt thank you
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
