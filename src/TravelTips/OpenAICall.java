@@ -1,4 +1,4 @@
-package CountryInfo_p.AI;
+package TravelTips;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.OutputStream;

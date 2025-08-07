@@ -9,6 +9,8 @@ import Flights.FlightSearchPage;
 
 import javax.swing.*;
 import java.awt.*;
+
+import TravelTips.TravelTipsPage;
 import core.*;
 
 public class HomePage extends JFrame {
@@ -96,6 +98,33 @@ public class HomePage extends JFrame {
 
             countryInfoView.setVisible(true);
         });
+
+        // ---------------- Travel Tips % Warnings Button Creation ----------------
+        JButton travelTipsButton = new JButton("Travel Tips & Warnings");
+        travelTipsButton.setPreferredSize(new Dimension(460, 150)); // Wider width
+        travelTipsButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        travelTipsButton.setFocusPainted(false);
+        travelTipsButton.setBackground(new Color(204, 229, 255));
+        travelTipsButton.setForeground(new Color(0, 102, 204));
+        travelTipsButton.setBorder(BorderFactory.createLineBorder(new Color(0, 102, 204), 2));
+
+        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        centerWrapper.setOpaque(false);
+        centerWrapper.add(travelTipsButton);
+
+        JPanel bottomButtonPanel = new JPanel();
+        bottomButtonPanel.setBackground(new Color(173, 216, 230));
+        bottomButtonPanel.setLayout(new BoxLayout(bottomButtonPanel, BoxLayout.Y_AXIS));
+        bottomButtonPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        bottomButtonPanel.add(centerWrapper);
+
+        add(bottomButtonPanel, BorderLayout.SOUTH);
+
+        // ---------------- Travel Tips % Warnings Button Functionality  ----------------
+        travelTipsButton.addActionListener(e -> {
+            TravelTipsPage.showPanel();
+        });
+
 
         // ---------------- Plan a Trip functionality ----------------
         planTripButton.addActionListener(e-> {
