@@ -1,4 +1,4 @@
-package CountryInfo_p.AI;
+package TravelTips;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.OutputStream;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class OpenAICall {
 
-    private  static  final String API_KEY = "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";
+    private  static  final String API_KEY = "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";
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
 
     public static String getTravelInsights(String airport_or_city) {
