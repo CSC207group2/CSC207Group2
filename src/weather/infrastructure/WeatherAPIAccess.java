@@ -1,14 +1,17 @@
 package weather.infrastructure;
 
+import weather.domain.WeatherService;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 
-public class WeatherAPIAccess {
+public class WeatherAPIAccess implements WeatherService {
 
-    public static String getWeatherJson(String city, String date) throws Exception {
+    @Override
+    public String getWeatherJson(String city, String date) throws Exception {
         LocalDate current = LocalDate.now();
         int elapsedDays = DateCalculator.getDatesBetween(current.toString(), date).size();
         System.out.println(elapsedDays);

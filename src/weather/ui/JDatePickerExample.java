@@ -1,8 +1,10 @@
 package weather.ui;
 
+import weather.domain.WeatherService;
 import weather.infrastructure.DateCalculator;
 import weather.infrastructure.GetWeatherRange;
 import weather.domain.WeatherDay;
+import weather.infrastructure.WeatherAPIAccess;
 import weather.infrastructure.WeatherJSONParser;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -87,7 +89,9 @@ public class JDatePickerExample {
                         formatter.format(pastDate), formatter.format(futureDate)
                 );
 
-                ArrayList<JSONObject> rawJsonList = GetWeatherRange.returnWeatherList(dateList, location);
+                WeatherService weatherService = new WeatherAPIAccess();
+                GetWeatherRange rangeGetter = new GetWeatherRange(weatherService);
+                ArrayList<JSONObject> rawJsonList = rangeGetter.returnWeatherList(dateList, location);
                 ArrayList<WeatherDay> weatherDays = WeatherJSONParser.parseWeatherDays(rawJsonList);
 
                 // rendering
