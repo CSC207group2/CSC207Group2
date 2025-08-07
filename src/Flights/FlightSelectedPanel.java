@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class FlightSelectedPanel {
     public FlightSelectedPanel(JsonArray flights, JComboBox<String> flightSelector, Map<String, Map<String, String>>
-            departure_info, Map<String, Map<String, String>> arrival_info, List<String> travel_class){
+            departure_info, Map<String, Map<String, String>> arrival_info, List<String> travel_class, String username){
         JButton continueButton = new JButton("Continue");
         JButton backButton = new JButton("Go Back");
         List<JsonObject> selectedFlights = new ArrayList<>();
@@ -58,7 +58,7 @@ public class FlightSelectedPanel {
             continueButton.addActionListener(e2 -> {
                 showSelection.dispose();
                 FlightSelection.selectedFlight(departure_info, arrival_info,
-                        Objects.requireNonNull(flightSelector.getSelectedItem()).toString(), travel_class);
+                        Objects.requireNonNull(flightSelector.getSelectedItem()).toString(), travel_class, username);
             });
         }
         }
