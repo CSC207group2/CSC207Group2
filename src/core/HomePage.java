@@ -87,6 +87,7 @@ public class HomePage extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
 
         exploreButton.addActionListener(e -> {
+            dispose();
             CountryInfoView countryInfoView = new CountryInfoView();
             CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
             RESTCountriesAPI dataAccess = new RESTCountriesAPI();
