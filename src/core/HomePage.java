@@ -5,11 +5,10 @@ import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
 import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
 import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
-import Flights.FlightSearchPage;
+import Flights.FlightSearchPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import core.*;
 
 public class HomePage extends JFrame {
     public HomePage(String username) {
@@ -100,7 +99,7 @@ public class HomePage extends JFrame {
         // ---------------- Plan a Trip functionality ----------------
         planTripButton.addActionListener(e-> {
             dispose();
-            FlightSearchPage.showPanel();
+            FlightSearchPanel.showPanel();
         });
 
         // ---------------- Logout functionality ----------------

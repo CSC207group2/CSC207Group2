@@ -16,7 +16,6 @@ public class FlightSelection extends JFrame {
         StringBuilder sb = new StringBuilder();
         StringBuilder sb1 = new StringBuilder();
 
-
         String depAirport = departure_data.get(flight).get("name");
         String depTime = departure_data.get(flight).get("time");
         String arrAirport = arrival_data.get(flight).get("name");
@@ -27,7 +26,6 @@ public class FlightSelection extends JFrame {
 
         sb.append("Leaving From: ").append(depAirport).append(" at ").append(depTime);
         sb1.append("Arriving To: ").append(arrAirport).append(" at ").append(arrTime);
-
 
         JPanel selected = new JPanel();
         selected.setLayout(new BoxLayout(selected, BoxLayout.Y_AXIS));
@@ -48,7 +46,7 @@ public class FlightSelection extends JFrame {
         JFrame showSelection = new JFrame();
         showSelection.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         showSelection.getContentPane().add(selected);
-        showSelection.setSize(550, 120);
+        showSelection.setSize(600, 120);
         showSelection.setLocationRelativeTo(null);
         showSelection.setVisible(true);
         backButton.addActionListener(e1 -> showSelection.dispose());
