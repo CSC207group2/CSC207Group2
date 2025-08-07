@@ -13,6 +13,12 @@ import java.util.Map;
 
 public class FlightSearch extends FlightSearchPage{
 
+    private static String username;
+
+    public static void setUsername(String u) {
+        username = u;
+    }
+
     public static void searchFlights(String departure, String arrival, String date, Integer stops, String returnDate,
                                      JTextArea resultsArea, JButton selectButton, JComboBox<String> flightSelector) {
         OkHttpClient client = new OkHttpClient();
@@ -169,7 +175,7 @@ public class FlightSearch extends FlightSearchPage{
 
                 selectButton.addActionListener(e -> {
                     FlightSelectedPanel flightSelectedPanel = new FlightSelectedPanel(flights, flightSelector,
-                            departure_info, arrival_info, travel_class);
+                            departure_info, arrival_info, travel_class, username);
 
                 });
 
