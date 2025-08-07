@@ -1,12 +1,9 @@
 package TravelTips;
 
-import Flights.FlightSearchPage;
 import core.HomePage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class TravelTipsPage extends JFrame {
 
@@ -23,11 +20,11 @@ public class TravelTipsPage extends JFrame {
         // Top input panel
         JPanel inputPanel = new JPanel(new FlowLayout());
         JLabel label = new JLabel("City or Airport Name:");
-        JTextField countryField = new JTextField(20);
+        JTextField cityField = new JTextField(20);
         JButton searchButton = new JButton("Find Out");
 
         inputPanel.add(label);
-        inputPanel.add(countryField);
+        inputPanel.add(cityField);
         inputPanel.add(searchButton);
 
         // Center result display
@@ -55,20 +52,29 @@ public class TravelTipsPage extends JFrame {
         // Button listeners
         goBackButton.addActionListener(e -> {
             dispose(); // Close current window
-            new HomePage(core.Main.getUsername()).setVisible(true); // Go back to home (assuming it exists)
+            new HomePage(core.Main.getUsername()).setVisible(true); // Go back to homepage
         });
 
         searchButton.addActionListener(e -> {
-            String country = countryField.getText();
-            if (country.isEmpty()) {
-                resultArea.setText("Please enter a country name.");
+            String input = cityField.getText().trim();
+
+            if (input.isEmpty()) {
+                resultArea.setText("Please enter a city or airport name.");
             } else {
-                // Placeholder logic
-                resultArea.setText("Travel tips and warnings for " + country + ":\n\n- Tip 1\n- Tip 2\n- Warning 1");
+                resultArea.setText("Fetching travel tips for " + input + "...\n\nPlease wait.");
+
+                // Run OpenAI call in a new thread to keep UI responsive
+                new Thread(() -> {
+                    try {
+                        String response = OpenAICall.getTravelInsights(input);
+                        SwingUtilities.invokeLater(() -> resultArea.setText(response));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        SwingUtilities.invokeLater(() -> resultArea.setText("An error occurred while fetching tips."));
+                    }
+                }).start();
             }
         });
-
-
     }
 
     public static void showPanel() {
