@@ -7,6 +7,8 @@ import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
 import Flights.usecase.FlightSearchInteractor;
 import Flights.UI.FlightSearchPanel;
+import logs.data_access.FirebaseInitializer;
+import logs.interface_adapter.RecentLogsWindow;
 import weather.ui.WeatherView;
 
 import javax.swing.*;

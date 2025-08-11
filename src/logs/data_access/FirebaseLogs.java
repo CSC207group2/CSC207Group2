@@ -1,4 +1,4 @@
-package core;
+package logs.data_access;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -15,7 +15,7 @@ import java.util.Map;
 public class FirebaseLogs {
 
     /** Firebase DB root. */
-    static final String DB_ROOT =
+    public static final String DB_ROOT =
             "https://travelplannerauth-e78d0-default-rtdb.firebaseio.com";
 
     /**
