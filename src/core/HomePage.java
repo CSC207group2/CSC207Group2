@@ -7,6 +7,7 @@ import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
 import Flights.FlightSearch;
 import Flights.FlightSearchPanel;
+import weather.ui.WeatherView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,7 +91,7 @@ public class HomePage extends JFrame {
         buttonPanel.setOpaque(false);
 
         JButton planTripButton = styledButton("Plan a Trip");
-        JButton viewTripsButton = styledButton("View Trips");
+        JButton viewTripsButton = styledButton("Check Weather");
         JButton exploreButton = styledButton("Explore Destinations");
 
         buttonPanel.add(planTripButton);
@@ -110,7 +111,13 @@ public class HomePage extends JFrame {
             countryInfoView.setController(controller);
             countryInfoView.setVisible(true);
         });
+        viewTripsButton.addActionListener(e -> {
+                WeatherView weatherView = new WeatherView();
+                weatherView.launch(username);
+                dispose();
+                }
 
+        );
         // ---------------- Travel Tips % Warnings Button Creation ----------------
         JButton travelTipsButton = new JButton("Travel Tips & Warnings");
         travelTipsButton.setPreferredSize(new Dimension(460, 150)); // Wider width

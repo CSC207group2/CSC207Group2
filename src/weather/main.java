@@ -1,11 +1,10 @@
 package weather;
 
-import weather.infrastructure.WeatherAPIAccess;
-import weather.ui.JDatePickerExample;
+import weather.ui.WeatherView;
 
 public class main {
     public static void main(String[] args) throws Exception {
-        JDatePickerExample datePickerExample = new JDatePickerExample();
+        WeatherView datePickerExample = new WeatherView();
         datePickerExample.launch("debug");
     }
 }

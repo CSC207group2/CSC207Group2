@@ -10,7 +10,6 @@ import weather.infrastructure.WeatherJSONParser;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
-public class JDatePickerExample {
+public class WeatherView {
 
     private Date pastDate;
     private Date futureDate;
