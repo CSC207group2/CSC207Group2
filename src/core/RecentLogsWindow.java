@@ -2,91 +2,191 @@ package core;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import org.json.JSONObject;
 
 /**
- * This class opens a window to show the user's saved flight and country info logs.
+ * RecentLogsWindow
+ *
+ * Purpose:
+ *  - Fetch a user's saved flights & countries from Firebase RTDB (via REST)
+ *  - Render them in a human-friendly text view (no braces/JSON)
+ *
+ * Data shape (written by FirebaseLogs):
+ *   /data/{user}/savedFlights/{flightId}    -> { departureAirport, arrivalAirport, departureTime, arrivalTime, [savedAt] }
+ *   /data/{user}/savedCountries/{country}  -> { capital, currency, languages, [savedAt] }
+ *
+ * Notes:
+ *  - Uses SwingWorker to keep UI responsive.
+ *  - Uses org.json for lightweight parsing (JSONObject).
+ *  - Shows messages for empty data or transient HTTP issues.
  */
 public class RecentLogsWindow extends JFrame {
 
-    /**
-     * Constructor initializes the UI and fetches logs from Firebase.
-     */
+    /** Single text area used for the whole window (no shadowed locals). */
+    private final JTextArea recentLogs = new JTextArea();
+
+    /** Reasonable network timeouts (ms) for REST calls. */
+    private static final int CONNECT_TIMEOUT_MS = 5000;
+    private static final int READ_TIMEOUT_MS    = 7000;
+
     public RecentLogsWindow(String username) {
-        setTitle("My Recent Logs");
-        setSize(500, 400);
+        super("My Recent Logs");
+
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // UI component to display logs
-        JTextArea recentLogs = new JTextArea();
+        // Basic typography; monospaced is nice for alignment, sans-serif reads cleaner for most users—pick one.
         recentLogs.setEditable(false);
-        JScrollPane recentLogsScrollPane = new JScrollPane(recentLogs);
-        add(recentLogsScrollPane, BorderLayout.CENTER);
+        recentLogs.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        recentLogs.setText("Loading…");
 
-        // Fetch and display logs
-        fetchLogsFromFirebase(username, recentLogs);
+        add(new JScrollPane(recentLogs), BorderLayout.CENTER);
+
+        // Kick off background fetch
+        fetchLogsViaRest(username);
 
         setVisible(true);
     }
 
     /**
-     * Fetches the saved flight and country logs from Firebase for the given user.
-     *
-     * @param username the Firebase username
-     * @param textArea the JTextArea to populate with logs
+     * Fetches user's logs from: {DB_ROOT}/data/{safeUser}.json
+     * Rest result is parsed and formatted for display.
      */
-    private void fetchLogsFromFirebase(String username, JTextArea textArea) {
-        // 🔗 Get reference to this user in Firebase DB
-        DatabaseReference userRef = FirebaseDatabase.getInstance()
-                .getReference("data")
-                .child(username);
+    private void fetchLogsViaRest(String username) {
+        final String safeUser = urlKey(username);
+        final String url = FirebaseLogs.DB_ROOT + "/data/" + safeUser + ".json";
 
-        // 👂 Read data once using ValueEventListener
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        new SwingWorker<String, Void>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                StringBuilder logs = new StringBuilder();
+            protected String doInBackground() {
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+                    // Set method + headers expected by Firebase REST
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Accept", "application/json");
+                    // Timeouts so the UI doesn't sit forever on bad networks
+                    conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                    conn.setReadTimeout(READ_TIMEOUT_MS);
 
-                // ✈ Flights log
-                if (dataSnapshot.hasChild("savedFlights")) {
-                    logs.append("✈ Flights:\n");
-                    for (DataSnapshot flightSnapshot : dataSnapshot.child("savedFlights").getChildren()) {
-                        for (DataSnapshot field : flightSnapshot.getChildren()) {
-                            logs.append(field.getKey()).append(": ")
-                                    .append(field.getValue().toString()).append("\n");
-                        }
-                        logs.append("\n");
+                    int code = conn.getResponseCode();
+                    InputStream in = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+                    String body = (in != null) ? new String(in.readAllBytes(), StandardCharsets.UTF_8) : "";
+
+                    if (code != 200) {
+                        // Keep this message simple & actionable for end users
+                        return "Couldn’t load your logs right now (HTTP " + code + "). Please try again.";
                     }
-                }
-
-                // 🌍 Country log
-                if (dataSnapshot.hasChild("savedCountries")) {
-                    logs.append("🌍 Country Info:\n");
-                    for (DataSnapshot countrySnapshot : dataSnapshot.child("savedCountries").getChildren()) {
-                        logs.append(countrySnapshot.getKey()).append(": ")
-                                .append(countrySnapshot.getValue().toString()).append("\n");
+                    if (body == null || body.isBlank() || "null".equalsIgnoreCase(body.trim())) {
+                        return "No logs yet. Try saving a flight or a country from the app.";
                     }
-                }
 
-                if (!dataSnapshot.hasChild("savedFlights") && !dataSnapshot.hasChild("savedCountries")) {
-                    textArea.setText("No logs yet. Try saving a flight or a country from the app.");
-                    return;
-                }
+                    return formatLogs(body);
 
-                // 📝 Update the text area with logs
-                textArea.setText(logs.toString());
+                } catch (Exception e) {
+                    // Network/parse errors show a friendly line, not a stack trace
+                    return "Couldn’t load your logs. Please check your connection and try again.";
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                textArea.setText("Error loading logs: " + error.getMessage());
+            protected void done() {
+                try {
+                    recentLogs.setText(get());
+                } catch (Exception e) {
+                    recentLogs.setText("Something went wrong showing your logs. Please try again.");
+                }
             }
-        });
+        }.execute();
+    }
+
+    /**
+     * Convert the raw JSON into readable sections.
+     */
+    private static String formatLogs(String json) {
+        try {
+            JSONObject root = new JSONObject(json);
+            StringBuilder sb = new StringBuilder();
+
+            // ── Countries section ──────────────────────────────────────────────
+            if (root.has("savedCountries")) {
+                sb.append("🌍 Saved Countries\n");
+                sb.append("────────────────────\n");
+                JSONObject countries = root.getJSONObject("savedCountries");
+
+                List<String> names = new ArrayList<>(countries.keySet());
+                Collections.sort(names, String::compareToIgnoreCase);
+
+                for (String country : names) {
+                    JSONObject info = countries.optJSONObject(country);
+                    if (info == null) continue;
+
+                    sb.append("• ").append(country).append("\n");
+                    addIfPresent(sb, "    Capital",   info.optString("capital",   null));
+                    addIfPresent(sb, "    Currency",  info.optString("currency",  null));
+                    addIfPresent(sb, "    Languages", info.optString("languages", null));
+                    sb.append("\n");
+                }
+                sb.append("\n");
+            }
+
+            // ── Flights section ────────────────────────────────────────────────
+            if (root.has("savedFlights")) {
+                sb.append("✈ Saved Flights\n");
+                sb.append("────────────────────\n");
+                JSONObject flights = root.getJSONObject("savedFlights");
+
+                List<String> codes = new ArrayList<>(flights.keySet());
+                Collections.sort(codes, String::compareToIgnoreCase);
+
+                for (String code : codes) {
+                    JSONObject info = flights.optJSONObject(code);
+                    if (info == null) continue;
+
+                    String depAirport = info.optString("departureAirport", "N/A");
+                    String depTime    = info.optString("departureTime",    "N/A");
+                    String arrAirport = info.optString("arrivalAirport",   "N/A");
+                    String arrTime    = info.optString("arrivalTime",      "N/A");
+
+                    sb.append("• ").append(code).append("\n");
+                    sb.append("    From: ").append(depAirport).append(" (").append(depTime).append(")\n");
+                    sb.append("    To:   ").append(arrAirport).append(" (").append(arrTime).append(")\n");
+                    sb.append("\n");
+                }
+            }
+
+            if (sb.length() == 0) {
+                return "No logs yet. Try saving a flight or a country from the app.";
+            }
+            return sb.toString();
+
+        } catch (Exception e) {
+            // If parsing fails, fall back to a helpful message
+            return "Your logs were found but couldn’t be parsed. Please try again.";
+        }
+    }
+
+    /** Append a labeled line only when a value exists and is non-blank. */
+    private static void addIfPresent(StringBuilder sb, String label, String value) {
+        if (value != null && !value.isBlank() && !"null".equalsIgnoreCase(value.trim())) {
+            sb.append(label).append(": ").append(value).append("\n");
+        }
+    }
+
+    /**
+     * Make a safe Firebase key from arbitrary text.
+     * Firebase keys can’t contain /.#$[]; we also normalize spaces/symbols to underscore.
+     */
+    private static String urlKey(String s) {
+        if (s == null) return "";
+        return s.trim().replaceAll("[^A-Za-z0-9_-]", "_");
     }
 }
