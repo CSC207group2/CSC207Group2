@@ -1,6 +1,7 @@
 package weather.infrastructure;
 
 import weather.domain.WeatherService;
+import weather.infrastructure.APIKey;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,16 +13,17 @@ public class WeatherAPIAccess implements WeatherService {
 
     @Override
     public String getWeatherJson(String city, String date) throws Exception {
+        APIKey apiKey = new APIKey();
         LocalDate current = LocalDate.now();
         int elapsedDays = DateCalculator.getDatesBetween(current.toString(), date).size();
         System.out.println(elapsedDays);
         String requestUrl;
         if (elapsedDays <= 14) {
             requestUrl = "https://api.weatherapi.com/v1/forecast.json?key=" +
-                    System.getenv("WeatherAPI") + "&q=" + city + "&days=" + elapsedDays;
+                    apiKey.APIKey + "&q=" + city + "&days=" + elapsedDays;
         }else {
             requestUrl = "https://api.weatherapi.com/v1/future.json?key=" +
-                    System.getenv("WeatherAPI") + "&q=" + city + "&dt=" + date;
+                    apiKey.APIKey + "&q=" + city + "&dt=" + date;
         }
         URL url = new URL(requestUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
