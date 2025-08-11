@@ -37,8 +37,9 @@ public class WeatherView {
 
         JFrame frame = new JFrame("Weather");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+        frame.setSize(600, 250);
         frame.setLayout(new FlowLayout());
+        frame.setLocationRelativeTo(null);
 
         JTextField locationField = new JTextField(20);
         JLabel locationLabel = new JLabel("Location:");
