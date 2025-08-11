@@ -3,23 +3,33 @@ package TravelTips;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.io.IOException;
+import java.time.Duration;
 
 public class OpenAICall {
 
-    // Your Node proxy (change to your deployed URL later)
-    private static final String PROXY_URL = "http://localhost:3000/api/chat";
-    // Must match BACKEND_AUTH_TOKEN in your Node .env
+    // Deployed proxy URL (Render)
+    private static final String PROXY_URL = "https://openai-proxy-3toa.onrender.com/api/chat";
+    // Must match BACKEND_AUTH_TOKEN set in Render (consider rotating to a longer token)
     private static final String PROXY_TOKEN = "dheiainw";
 
     private static final MediaType JSON = MediaType.parse("application/json");
-    private static final OkHttpClient HTTP = new OkHttpClient();
+
+    // Small timeouts so the UI doesn’t hang forever on network issues
+    private static final OkHttpClient HTTP = new OkHttpClient.Builder()
+            .callTimeout(Duration.ofSeconds(45))
+            .connectTimeout(Duration.ofSeconds(20))
+            .readTimeout(Duration.ofSeconds(40))
+            .writeTimeout(Duration.ofSeconds(40))
+            .build();
 
     public static String getTravelInsights(String airportOrCity) {
         try {
-            String prompt = "Write me a 100 word summary of common scams, places to avoid, and common tourist attractions in the following airport or city. If input its not a city or an airport name, then reply with Incorrect Input, Please submit a Airport or a City "
-                    + airportOrCity + ".";
+            String prompt =
+                    "Write me a 100 word summary of common scams, places to avoid, and common tourist attractions "
+                            + "in the following airport or city. If input is not a city or an airport name, then reply with "
+                            + "\"Incorrect Input, Please submit an Airport or a City\": " + airportOrCity + ".";
 
-            // The proxy expects { "messages": [...] }
             JSONObject body = new JSONObject();
             body.put("messages", new JSONArray()
                     .put(new JSONObject().put("role", "user").put("content", prompt)));
@@ -33,7 +43,7 @@ public class OpenAICall {
             try (Response res = HTTP.newCall(request).execute()) {
                 if (!res.isSuccessful()) {
                     String err = res.body() != null ? res.body().string() : "";
-                    throw new RuntimeException("HTTP " + res.code() + ": " + err);
+                    throw new IOException("HTTP " + res.code() + ": " + err);
                 }
                 String resp = res.body().string();
                 JSONObject json = new JSONObject(resp);
