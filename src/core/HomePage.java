@@ -102,6 +102,7 @@ public class HomePage extends JFrame {
 
         // ---------------- Explore Destinations (Country Info) ----------------
         exploreButton.addActionListener(e -> {
+            dispose();
             CountryInfoView countryInfoView = new CountryInfoView(username); // <-- pass it
             CountryInfoPresenter presenter = new CountryInfoPresenter(countryInfoView);
             RESTCountriesAPI dataAccess = new RESTCountriesAPI();
