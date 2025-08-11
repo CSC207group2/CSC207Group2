@@ -5,15 +5,14 @@ import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
 import CountryInfo_p.interface_adapter.country_info.CountryInfoPresenter;
 import CountryInfo_p.use_case.country_info.CountryInfoInteractor;
 import CountryInfo_p.view.CountryInfoView;
-import Flights.FlightSearch;
-import Flights.FlightSearchPanel;
+import Flights.usecase.FlightSearchInteractor;
+import Flights.UI.FlightSearchPanel;
 import weather.ui.WeatherView;
 
 import javax.swing.*;
 import java.awt.*;
 
 import TravelTips.TravelTipsPage;
-import core.*;
 
 public class HomePage extends JFrame {
     public HomePage(String username) {
@@ -149,7 +148,7 @@ public class HomePage extends JFrame {
         planTripButton.addActionListener(e -> {
             dispose();
             // Make username available to the flights feature before showing UI
-            FlightSearch.setUsername(username);
+            FlightSearchInteractor.setUsername(username);
             FlightSearchPanel.showPanel();
         });
     }

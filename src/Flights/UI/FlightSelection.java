@@ -1,9 +1,10 @@
-package Flights;
+package Flights.UI;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 
+import Flights.infrastructure.SavedFlights;
 import core.*;
 
 public class FlightSelection extends JFrame {

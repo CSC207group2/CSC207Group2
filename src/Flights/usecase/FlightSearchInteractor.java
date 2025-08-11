@@ -1,17 +1,20 @@
-package Flights;
+package Flights.usecase;
 
+import Flights.UI.FlightSelectedPanel;
+import Flights.data_access.FlightAPI;
 import com.google.gson.*;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlightSearch extends FlightSearchPanel {
+public class FlightSearchInteractor{
 
     private static String username;
 
@@ -20,64 +23,34 @@ public class FlightSearch extends FlightSearchPanel {
     }
 
     public static void searchFlights(String departure, String arrival, String date, Integer stops, String returnDate,
-                                     JTextArea resultsArea, JButton selectButton, JComboBox<String> flightSelector) {
-        OkHttpClient client = new OkHttpClient();
-        String apiKey = "bd819152c9b1d1d216a3283df4f544164f348d2ac206f60e0ff95472c2a0303d"; // Replace with your actual API key
-        String url = "https://serpapi.com/search.json?engine=google_flights"
-                + "&departure_id=" + departure.toUpperCase()
-                + "&arrival_id=" + arrival.toUpperCase()
-                + "&outbound_date=" + date
-                + "&return_date=" + returnDate
-                + "&api_key=" + apiKey
-                + "&stops=" + stops;
+                                     JTextArea resultsArea, JButton selectButton, JComboBox<String> flightSelector) throws IOException {
+        FlightAPI flightAPI = new FlightAPI();
+        JsonArray flights = flightAPI.searchFlights(departure, arrival, date, returnDate, stops);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                String jsonData = response.body().string();
-                JsonObject json = JsonParser.parseString(jsonData).getAsJsonObject();
-
-                JsonArray flights = json.getAsJsonArray("best_flights");
-                JsonArray otherFlights = json.getAsJsonArray("other_flights");
-
-                flights.addAll(otherFlights);
-
-                if (flights.isEmpty()) {
-                    resultsArea.setText("No flights found.");
-                    return;
-                }
-
-                StringBuilder sb = new StringBuilder();
-
-                flightSelector.removeAllItems();
-
-                for (int i = 0; i < flights.size(); i++) {
-                    flightSelector.addItem("Flight #" + (i + 1));
-                }
-
-                int flight_counter = 0;
-                Map<String, Map<String, String>> departure_info = new HashMap<>();
-                Map<String, Map<String, String>> arrival_info = new HashMap<>();
-                List<String> travel_class = new ArrayList<>();
-
-                getFlightSearch(flights, flight_counter, departure_info, arrival_info, travel_class, sb);
-                resultsArea.setText(sb.toString());
-
-                selectButton.addActionListener(e -> {
-                    new FlightSelectedPanel(flights, flightSelector, departure_info, arrival_info, travel_class, username);
-                });
-
-            } else {
-                System.out.println("Request failed: " + response.code());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            resultsArea.setText("An error occurred: " + e.getMessage());
+        if (flights.isEmpty()) {
+            resultsArea.setText("No flights found.");
+            return;
         }
+
+        StringBuilder sb = new StringBuilder();
+
+        flightSelector.removeAllItems();
+
+        for (int i = 0; i < flights.size(); i++) {
+            flightSelector.addItem("Flight #" + (i + 1));
+        }
+
+        int flight_counter = 0;
+        Map<String, Map<String, String>> departure_info = new HashMap<>();
+        Map<String, Map<String, String>> arrival_info = new HashMap<>();
+        List<String> travel_class = new ArrayList<>();
+
+        getFlightSearch(flights, flight_counter, departure_info, arrival_info, travel_class, sb);
+        resultsArea.setText(sb.toString());
+
+        selectButton.addActionListener(e -> {
+            new FlightSelectedPanel(flights, flightSelector, departure_info, arrival_info, travel_class, username);
+        });
     }
 
     private static void getFlightSearch(JsonArray flights, int flight_counter, Map<String, Map<String, String>> departure_info, Map<String, Map<String, String>> arrival_info, List<String> travel_class, StringBuilder sb) {
@@ -171,7 +144,7 @@ public class FlightSearch extends FlightSearchPanel {
                 if (firstFlight.has("name")) {
                     layover_location = firstFlight.get("name").getAsString();
                 }
-                if (firstFlight.has("duration")){
+                if (firstFlight.has("duration")) {
                     layover_duration = firstFlight.get("duration").getAsInt();
                     int durationHours = layover_duration / 60;
                     int durationMinute = layover_duration % 60;
@@ -183,10 +156,9 @@ public class FlightSearch extends FlightSearchPanel {
 
             }
 
-
             sb.append("\n------------------------\n\n");
 
-
         }
+
     }
 }

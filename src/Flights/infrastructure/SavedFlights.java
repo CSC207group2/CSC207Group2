@@ -1,6 +1,4 @@
-package Flights;
-
-import java.util.List;
+package Flights.infrastructure;
 
 public class SavedFlights {
     public String flightId;

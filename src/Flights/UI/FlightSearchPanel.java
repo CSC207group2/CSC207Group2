@@ -1,11 +1,14 @@
-package Flights;
+package Flights.UI;
 
 import javax.swing.*;
+
+import Flights.usecase.FlightSearchInteractor;
 import core.*;
 import org.jdatepicker.impl.*;
 import org.jetbrains.annotations.NotNull;
 import weather.ui.DateLabelFormatter;
 
+import java.io.IOException;
 import java.util.Properties;
 import java.text.SimpleDateFormat;
 
@@ -94,7 +97,12 @@ public class FlightSearchPanel extends JFrame {
             String returnDate = arrivalDate;
             Integer stop = stops.getSelectedIndex();
             resultsArea.setText("Searching...\n");
-            FlightSearch.searchFlights(dest, ariv, date, stop, returnDate, resultsArea, selectButton, flightSelector);
+            try {
+                FlightSearchInteractor.searchFlights(dest, ariv, date, stop, returnDate, resultsArea, selectButton, flightSelector);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                resultsArea.setText("An error occurred: " + e1.getMessage());
+            }
         });
         return flightPanel;
     }
