@@ -2,15 +2,12 @@ package weather.ui;
 
 import core.HomePage;
 import weather.domain.WeatherService;
-import weather.infrastructure.DateCalculator;
-import weather.infrastructure.GetWeatherRange;
 import weather.domain.WeatherDay;
 import weather.infrastructure.WeatherAPIAccess;
-import weather.infrastructure.WeatherJSONParser;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-import org.json.JSONObject;
+import weather.usecase.FetchWeatherData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +21,6 @@ public class WeatherView {
     private Date pastDate;
     private Date futureDate;
     private JPanel scrollPanel;
-    private JScrollPane scrollPane;
 
     public void launch(String user) {
 
@@ -65,7 +61,7 @@ public class WeatherView {
         JButton confirmationButton = new JButton("Confirm Date");
         JButton backButton = new JButton("Back to Home");
         scrollPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        scrollPane = new JScrollPane(scrollPanel);
+        JScrollPane scrollPane = new JScrollPane(scrollPanel);
         scrollPane.setPreferredSize(new Dimension(550, 100));
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -106,15 +102,13 @@ public class WeatherView {
                     return;
                 }
 
-                ArrayList<String> dateList = DateCalculator.getDatesBetween(
-                        formatter.format(pastDate), formatter.format(futureDate)
+                WeatherService service = new WeatherAPIAccess();
+                FetchWeatherData fetcher = new FetchWeatherData(service);
+                ArrayList<WeatherDay> weatherDays = fetcher.execute(
+                        location,
+                        formatter.format(pastDate),
+                        formatter.format(futureDate)
                 );
-
-                WeatherService weatherService = new WeatherAPIAccess();
-                GetWeatherRange rangeGetter = new GetWeatherRange(weatherService);
-                ArrayList<JSONObject> rawJsonList = rangeGetter.returnWeatherList(dateList, location);
-                ArrayList<WeatherDay> weatherDays = WeatherJSONParser.parseWeatherDays(rawJsonList);
-
                 // rendering
                 scrollPanel.removeAll();
                 int x = 10;
