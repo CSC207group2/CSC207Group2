@@ -4,11 +4,11 @@ import javax.swing.*;
 
 import Flights.usecase.FlightSearchInteractor;
 import core.*;
+import logs.interface_adapter.LabelTextPanel;
 import org.jdatepicker.impl.*;
 import org.jetbrains.annotations.NotNull;
 import weather.ui.DateLabelFormatter;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.text.SimpleDateFormat;
 
