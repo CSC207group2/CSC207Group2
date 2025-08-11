@@ -11,6 +11,7 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import org.json.JSONObject;
+import weather.usecase.FetchWeatherData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -106,15 +107,13 @@ public class WeatherView {
                     return;
                 }
 
-                ArrayList<String> dateList = DateCalculator.getDatesBetween(
-                        formatter.format(pastDate), formatter.format(futureDate)
+                WeatherService service = new WeatherAPIAccess();
+                FetchWeatherData fetcher = new FetchWeatherData(service);
+                ArrayList<WeatherDay> weatherDays = fetcher.execute(
+                        location,
+                        formatter.format(pastDate),
+                        formatter.format(futureDate)
                 );
-
-                WeatherService weatherService = new WeatherAPIAccess();
-                GetWeatherRange rangeGetter = new GetWeatherRange(weatherService);
-                ArrayList<JSONObject> rawJsonList = rangeGetter.returnWeatherList(dateList, location);
-                ArrayList<WeatherDay> weatherDays = WeatherJSONParser.parseWeatherDays(rawJsonList);
-
                 // rendering
                 scrollPanel.removeAll();
                 int x = 10;
