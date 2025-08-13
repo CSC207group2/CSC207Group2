@@ -51,8 +51,8 @@ public class FlightSelectedPanel {
             showSelection.setLocationRelativeTo(null);
             showSelection.setVisible(true);
             backButton.addActionListener(e1 -> {
-                selectedFlights.clear();
                 showSelection.dispose();
+                selectedFlights.clear();
             });
 
             continueButton.addActionListener(e2 -> {
