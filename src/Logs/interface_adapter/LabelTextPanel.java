@@ -1,4 +1,4 @@
-package logs.interface_adapter;
+package Logs.interface_adapter;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;

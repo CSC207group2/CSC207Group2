@@ -4,7 +4,7 @@ import javax.swing.*;
 
 import Flights.usecase.FlightSearchInteractor;
 import core.*;
-import logs.interface_adapter.LabelTextPanel;
+import Logs.interface_adapter.LabelTextPanel;
 import org.jdatepicker.impl.*;
 import org.jetbrains.annotations.NotNull;
 import weather.ui.DateLabelFormatter;

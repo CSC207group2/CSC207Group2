@@ -3,7 +3,7 @@ package CountryInfo_p.view;
 import CountryInfo_p.interface_adapter.country_info.CountryInfoController;
 import CountryInfo_p.use_case.country_info.CountryInfoOutputBoundary;
 import CountryInfo_p.use_case.country_info.CountryInfoOutputData;
-import logs.data_access.FirebaseLogs;
+import Logs.data_access.FirebaseLogs;
 import core.HomePage;
 
 import javax.swing.*;

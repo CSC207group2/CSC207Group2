@@ -1,4 +1,4 @@
-package logs.interface_adapter;
+package Logs.interface_adapter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import logs.data_access.FirebaseLogs;
+import Logs.data_access.FirebaseLogs;
 import org.json.JSONObject;
 
 /**

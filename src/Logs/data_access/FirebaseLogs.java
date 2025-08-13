@@ -1,4 +1,4 @@
-package logs.data_access;
+package Logs.data_access;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
