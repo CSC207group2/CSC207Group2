@@ -1,4 +1,4 @@
-package logs.interface_adapter;
+package Logs.interface_adapter;
 
 import java.io.*;
 import java.net.*;

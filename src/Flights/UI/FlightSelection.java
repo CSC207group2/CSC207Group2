@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import Flights.infrastructure.SavedFlights;
-import logs.data_access.FirebaseLogs;
+import Logs.data_access.FirebaseLogs;
 
 public class FlightSelection extends JFrame {
     public static void selectedFlight(Map<String, Map<String, String>> departure_data, Map<String,

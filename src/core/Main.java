@@ -1,7 +1,7 @@
 package core;
 
-import logs.interface_adapter.FirebaseLogin;
-import logs.interface_adapter.LabelTextPanel;
+import Logs.interface_adapter.FirebaseLogin;
+import Logs.interface_adapter.LabelTextPanel;
 
 import javax.swing.*;
 import java.util.HashMap;
