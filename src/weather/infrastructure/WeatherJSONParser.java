@@ -6,8 +6,18 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Parses JSON weather data into WeatherDay objects.
+ */
 public class WeatherJSONParser {
 
+    /**
+     * Converts a list of weather forecast JSON objects into a list of WeatherDay instances.
+     * Extracts the date, maximum temperature, and minimum temperature from each forecast.
+     *
+     * @param jsonObjects list of weather forecast data as JSONObjects
+     * @return list of parsed WeatherDay objects
+     */
     public static ArrayList<WeatherDay> parseWeatherDays(ArrayList<JSONObject> jsonObjects) {
         ArrayList<WeatherDay> result = new ArrayList<>();
 
