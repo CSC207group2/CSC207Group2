@@ -16,24 +16,29 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
+/**
+ * A Swing-based user interface for selecting a location and date range to view weather forecasts.
+ * This class provides a form with location input, start and end date pickers,
+ * and displays the retrieved weather data in a scrollable panel.
+ */
 public class WeatherView {
 
     private Date pastDate;
     private Date futureDate;
     private JPanel scrollPanel;
 
+
+    /**
+     * Launches the weather view interface for the given user.
+     * Allows the user to:
+     * Enter a location
+     * Select start and end dates using date pickers
+     * View weather forecasts for the chosen date range
+     * Navigate back to the home page
+     *
+     * @param user the username of the logged-in user, used for returning to the home page
+     */
     public void launch(String user) {
-//  Nimbus UI (Disabled for presentation)
-//        try {
-//            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         JFrame frame = new JFrame("Weather");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

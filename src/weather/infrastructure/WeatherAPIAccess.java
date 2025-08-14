@@ -9,8 +9,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 
+/**
+ * Provides access to the WeatherAPI service for retrieving weather data.
+ */
 public class WeatherAPIAccess implements WeatherService {
 
+    /**
+     * Retrieves weather data for the specified city and date in JSON format.
+     * Uses WeatherAPI's forecast endpoint for dates up to 14 days ahead,
+     * and the future endpoint for later dates.
+     *
+     * @param city name of the city to fetch weather for
+     * @param date target date in {@code yyyy-MM-dd} format
+     * @return weather data as a JSON string
+     * @throws Exception if an HTTP request fails or another error occurs
+     */
     @Override
     public String getWeatherJson(String city, String date) throws Exception {
         APIKey apiKey = new APIKey();
