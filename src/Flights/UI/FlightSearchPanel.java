@@ -101,7 +101,8 @@ public class FlightSearchPanel extends JFrame {
                 FlightSearchInteractor.searchFlights(dest, ariv, date, stop, returnDate, resultsArea, selectButton, flightSelector);
             } catch (Exception e1) {
                 e1.printStackTrace();
-                resultsArea.setText("An error occurred: " + e1.getMessage());
+                resultsArea.setText("An error occurred: Airport Code or Date Invalid." +
+                        " Please Enter Valid Country Code or Future Date ");
             }
         });
         return flightPanel;
